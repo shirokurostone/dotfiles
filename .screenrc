@@ -1,0 +1,13 @@
+escape ^z^z
+defencoding utf-8
+defscrollback 1000
+startup_message off
+vbell off
+
+hardstatus alwayslastline  "%-w[%n %t]%+w"
+
+bind -c REGION 2 split
+bind -c REGION 1 only
+bind -c REGION 0 remove
+bind -c REGION o focus
+bind x command -c REGION
