@@ -7,6 +7,7 @@ HISTCONTROL="ignoreboth"
 HISTFILE=~/.bash_history
 HISTSIZE=1000000
 SAVEHIST=1000000
+FIGNORE=${FIGNORE}:.svn:.git:.hg:CVS
 
 ########################################
 # alias
