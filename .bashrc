@@ -8,7 +8,6 @@ HISTFILE=~/.bash_history
 HISTSIZE=1000000
 SAVEHIST=1000000
 
-
 ########################################
 # alias
 
@@ -32,6 +31,20 @@ case "$OSTYPE" in
         alias ls="ls --color=auto"
         ;;
 esac
+
+
+########################################
+# SQL文誤爆防止
+
+alias CREATE='echo CREATE'
+alias SELECT='echo SELECT'
+alias INSERT='echo INSERT'
+alias UPDATE='echo UPDATE'
+alias DELETE='echo DELETE'
+alias DROP='echo DROP'
+alias EXPLAIN='echo EXPLAIN'
+alias WHERE='echo WHERE'
+alias FROM='echo FROM'
 
 
 ########################################
