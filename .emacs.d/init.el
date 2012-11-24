@@ -75,6 +75,7 @@
 (add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode))
 (setq ruby-indent-level 2)
 (setq ruby-indent-tabs-mode nil)
+(setq ruby-deep-indent-paren-style nil)
 
 ;; Esc :q => exit
 (define-prefix-command 'vim-like)
