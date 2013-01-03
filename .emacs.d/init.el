@@ -5,7 +5,7 @@
 (add-to-list 'load-path "~/.emacs.d/auto-install")
 
 ;; conf ディレクトリ以下のファイルをロード
-(dolist (file (directory-files "~/.emacs.d/conf" nil "^[^_][^.]+\\.el$"))
+(dolist (file (directory-files "~/.emacs.d/conf" nil "^[0-9]{2}-.*.el$"))
   (load file))
 
 ;; 選択されたリージョンに色を付ける
@@ -23,6 +23,13 @@
 ;; 対応する括弧をハイライト
 (show-paren-mode t)
 (setq show-paren-style 'expression)
+
+;; ファイル名の補完で大文字小文字を区別しない
+(setq completion-ignore-case t)
+
+;; 同名ファイルのバッファ名の識別文字列を変更
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 
 ;; linum
 (when (<= 23 emacs-major-version)
@@ -98,6 +105,14 @@
 
 ;; php-mode http://php-mode.sourceforge.net/
 (require 'php-mode)
+(add-hook 'php-mode-hook
+  (lambda ()
+    (c-set-style "stroustrup")
+    (setq tab-width 4)
+    (setq c-basic-offset 4)
+    (setq indent-tab-mode nil)
+  ))
+
 
 ;; Ricty
 (when (and (<= 23 emacs-major-version) window-system)
