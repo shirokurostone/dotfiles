@@ -1,5 +1,13 @@
 
 ########################################
+# autoload
+autoload -U compinit
+compinit -u
+autoload -Uz add-zsh-hook
+autoload -Uz is-at-least
+
+
+########################################
 # option
 
 # cdで自動pushd
@@ -61,11 +69,12 @@ bindkey -e
 bindkey '^P' history-beginning-search-backward
 bindkey '^N' history-beginning-search-forward
 
-
-########################################
-# 補完機能
-autoload -U compinit
-compinit -u
+# globを含めるインクリメンタル検索
+# http://subtech.g.hatena.ne.jp/secondlife/20110222/1298354852
+if is-at-least 4.3.10; then
+    bindkey '^R' history-incremental-pattern-search-backward
+    bindkey '^S' history-incremental-pattern-search-forward
+fi
 
 
 ########################################
@@ -73,6 +82,20 @@ compinit -u
 PROMPT="[${USER}@%m]%# "
 PROMPT2=" > "
 RPROMPT="[%~]"
+
+if is-at-least 4.3.7; then
+    # http://mollifier.hatenablog.com/entry/20090814/p1
+    # http://mollifier.hatenablog.com/entry/20100906/p1
+    autoload -Uz vcs_info
+    zstyle ':vcs_info:*' formats '(%s:%b)'
+    _update_vcs_info_msg () {
+	psvar=()
+	LANG=en_US.UTF-8 vcs_info
+	[[ -n "$vcs_info_msg_0_" ]] && psvar[1]="$vcs_info_msg_0_"
+    }
+    add-zsh-hook precmd _update_vcs_info_msg
+    PROMPT="[${USER}@%m%1(v|%1v|)]%# "
+fi
 
 if [ $UID = 0 ]; then
     PROMPT="%F{red}${PROMPT}%f"
@@ -105,6 +128,8 @@ alias ll='ls -lh'
 alias la='ls -a'
 alias lla='ls -alh'
 alias sl='ls'
+alias e='emacs'
+alias j='jobs'
 
 
 ########################################
@@ -149,6 +174,18 @@ if [ -d $HOME/local/bin ]; then
     export PATH=$PATH:$HOME/local/bin
 fi
 
+########################################
+# 関数
+
+
+s(){
+    if [ $# -eq 0 ]; then
+	screen -ls
+	return $?;
+    fi
+    screen -r $* || screen -S $*
+}
+
 
 ########################################
 # local設定
@@ -156,4 +193,3 @@ fi
 if [ -f $HOME/.zshrc.local ]; then
     source $HOME/.zshrc.local
 fi
-
