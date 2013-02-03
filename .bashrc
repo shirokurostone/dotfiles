@@ -47,6 +47,13 @@ alias EXPLAIN='echo EXPLAIN'
 alias WHERE='echo WHERE'
 alias FROM='echo FROM'
 
+########################################
+# bash completion 
+
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
 
 ########################################
 # local設定
