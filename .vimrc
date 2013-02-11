@@ -17,7 +17,8 @@ set ignorecase
 set smartcase
 
 " オートインデントを有効化
-set autoindent
+" set autoindent
+set cindent
 
 " オートインデント、改行、インサートモード開始直後に
 " バックスペースで削除できるようにする
@@ -37,4 +38,18 @@ set visualbell
 set t_vb=
 
 " 行番号を表示
-set number
+" set number
+
+" インクリメンタルサーチを有効化
+set incsearch
+
+" Vundle
+filetype off
+set rtp+=~/.vim/vundle.git/
+call vundle#rc()
+
+Bundle 'sudo.vim'
+
+
+filetype plugin indent on
+
