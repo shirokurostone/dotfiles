@@ -43,6 +43,14 @@ set t_vb=
 " インクリメンタルサーチを有効化
 set incsearch
 
+" タブをスペースに展開
+set expandtab
+
+" タブ幅の設定
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+
 " Vundle
 filetype off
 set rtp+=~/.vim/vundle.git/
