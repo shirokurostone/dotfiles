@@ -51,6 +51,15 @@ set tabstop=4
 set shiftwidth=4
 set softtabstop=4
 
+" ファイル選択時に補完表示
+set wildmenu
+
+" ファイルが変更されるとリロード
+set autoread
+
+" ファイル末尾まで検索すると先頭に戻る
+set wrapscan
+
 " Vundle
 filetype off
 set rtp+=~/.vim/vundle.git/
