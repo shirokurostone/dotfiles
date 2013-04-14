@@ -143,6 +143,7 @@ SAVEHIST=1000000
 
 # grepオプション
 export GREP_OPTIONS="--color=auto"
+export GREP_COLOR='31;01'
 
 # Mercurialの文字コード
 export HGENCODING=utf-8
