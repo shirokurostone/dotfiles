@@ -60,13 +60,64 @@ set autoread
 " ファイル末尾まで検索すると先頭に戻る
 set wrapscan
 
-" Vundle
-filetype off
-set rtp+=~/.vim/vundle.git/
-call vundle#rc()
+" デフォルトの文字コードをUTF-8に
+set encoding=utf-8
 
-Bundle 'sudo.vim'
+filetype plugin indent on
 
+" 分割・タブのキーバインドの設定
+" http://qiita.com/tekkoc/items/98adcadfa4bdc8b5a6ca
+nnoremap s <Nop>
 
+nnoremap ss :<C-u>sp<CR>
+nnoremap sv :<C-u>vs<CR>
+
+nnoremap sj <C-w>j
+nnoremap sk <C-w>k
+nnoremap sl <C-w>l
+nnoremap sh <C-w>h
+nnoremap sw <C-w>w
+
+nnoremap sJ <C-w>J
+nnoremap sK <C-w>K
+nnoremap sL <C-w>L
+nnoremap sH <C-w>H
+nnoremap sr <C-w>r
+
+nnoremap s> <C-w>>
+nnoremap s< <C-w><
+nnoremap s+ <C-w>+
+nnoremap s- <C-w>-
+nnoremap s= <C-w>=
+
+nnoremap st :<C-u>tabnew<CR>
+nnoremap sn gt
+nnoremap sp gT
+
+nnoremap sq :<C-u>q<CR>
+nnoremap sQ :<C-u>bd<CR>
+
+if has('vim_starting')
+    set nocompatible 
+    set runtimepath+=~/.vim/bundle/neobundle.vim/
+endif
+
+call neobundle#begin(expand('~/.vim/bundle/'))
+
+" Let NeoBundle manage NeoBundle
+" Required:
+NeoBundleFetch 'Shougo/neobundle.vim'
+
+NeoBundle 'Shougo/unite.vim'
+" My Bundles here:
+" NeoBundle 'Shougo/neosnippet.vim'
+" NeoBundle 'Shougo/neosnippet-snippets'
+" NeoBundle 'tpope/vim-fugitive'
+" NeoBundle 'kien/ctrlp.vim'
+" NeoBundle 'flazz/vim-colorschemes'
+
+call neobundle#end()
+
+" Required:
 filetype plugin indent on
 
