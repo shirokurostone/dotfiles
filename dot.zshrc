@@ -178,6 +178,20 @@ fi
 ########################################
 # 関数
 
+workspace(){
+  mkdir -p ~/workspace/$(date '+%Y-%m-%d')
+  cd ~/workspace/$(date '+%Y-%m-%d')
+  pwd
+}
+
+peco-select-history(){
+  BUFFER=$(history -n 1 | tail -r | peco --query "$LBUFFER")
+  CURSOUR=$#BUFFER
+  zle clear-screen
+}
+zle -N peco-select-history
+bindkey '^r' peco-select-history
+
 
 s(){
     if [ $# -eq 0 ]; then
