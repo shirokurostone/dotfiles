@@ -208,3 +208,7 @@ s(){
 if [ -f $HOME/.zshrc.local ]; then
     source $HOME/.zshrc.local
 fi
+
+function repo(){
+    cd $(ghq list -p | peco)
+}
