@@ -210,6 +210,10 @@ s(){
     screen -r $* || screen -S $*
 }
 
+# kubectl補完設定
+if [ $commands[kubectl] ]; then
+  source <(kubectl completion zsh)
+fi
 
 ########################################
 # local設定
