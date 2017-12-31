@@ -2,7 +2,10 @@
 ########################################
 # シェル変数・環境変数
 
-PS1="[\u@\h \W]\$ "
+#PS1="[\u@\h \W]\$ "
+#PS1='[\[\e[32m\u\e[0m\]@\[\e[36m\h\e[0m\]]\[\e[35m${vcs_message}\e[0m\] [\t] \[\e[33m\w\e[0m\]\n\$ '
+PS1='[\[\e[32m\u\e[0m\]@\[\e[36m\h\e[0m\]] [\t] \[\e[33m\w\e[0m\]\n\$ '
+
 HISTCONTROL="ignoreboth"
 HISTFILE=~/.bash_history
 HISTSIZE=1000000
