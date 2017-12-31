@@ -79,29 +79,38 @@ fi
 
 ########################################
 # プロンプト
-PROMPT="[${USER}@%m]%# "
+
+# https://qiita.com/mollifier/items/8d5a627d773758dd8078
+if is-at-least 4.3.10; then
+  autoload -Uz vcs_info
+  zstyle ':vcs_info:git:*' formats '%s:%b' '%c%u%m'
+  zstyle ':vcs_info:git:*' check-for-changes true
+  zstyle ':vcs_info:git:*' stagedstr "+"
+  zstyle ':vcs_info:git:*' unstagedstr "*"
+
+  function _update_vcs_info_msg(){
+    local vcs_message
+    LANG=en_US.UTF-8 vcs_info
+    if [[ -z ${vcs_info_msg_0_} ]]; then
+      vcs_message=""
+    else
+      vcs_message=" ("
+	  LANG=en_US.UTF-8 vcs_info
+	  [[ -n "$vcs_info_msg_0_" ]] && vcs_message="${vcs_message}${vcs_info_msg_0_}"
+	  [[ -n "$vcs_info_msg_1_" ]] && vcs_message="${vcs_message}${vcs_info_msg_1_}"
+	  [[ -n "$vcs_info_msg_2_" ]] && vcs_message="${vcs_message}${vcs_info_msg_2_}"
+      vcs_message="${vcs_message})"
+    fi
+
+    PROMPT="[%F{green}%n%f@%F{cyan}%m%f]%F{magenta}${vcs_message}%f [%*] %F{yellow}%d%f
+%# "
+  }
+  add-zsh-hook precmd _update_vcs_info_msg
+fi
+
+PROMPT=$'[%F{green}%n%f@%F{cyan}%m%f]%F{magenta}${vcs_message}%f [%*] %F{yellow}%d%f\n%# '
 PROMPT2=" > "
-RPROMPT="[%~]"
-
-if is-at-least 4.3.7; then
-    # http://mollifier.hatenablog.com/entry/20090814/p1
-    # http://mollifier.hatenablog.com/entry/20100906/p1
-    autoload -Uz vcs_info
-    zstyle ':vcs_info:*' formats '(%s:%b)'
-    _update_vcs_info_msg () {
-	psvar=()
-	LANG=en_US.UTF-8 vcs_info
-	[[ -n "$vcs_info_msg_0_" ]] && psvar[1]="$vcs_info_msg_0_"
-    }
-    add-zsh-hook precmd _update_vcs_info_msg
-    PROMPT="[${USER}@%m%1(v|%1v|)]%# "
-fi
-
-if [ $UID = 0 ]; then
-    PROMPT="%F{red}${PROMPT}%f"
-    PROMPT2="%F{red}${PROMPT2}%f"
-    RPROMPT="%F{red}${RPROMPT}%f"
-fi
+RPROMPT=""
 
 
 ########################################
