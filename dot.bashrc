@@ -62,3 +62,13 @@ if [ -f $HOME/.bashrc.local ]; then
     source $HOME/.bashrc.local
 fi
 
+if `which peco > /dev/null 2>& 1`; then
+  peco-select-history(){
+    BUFFER=$(history | history | sed -e 's/^ *[0-9]* *//g' | tail -r | peco --query "$LBUFFER")
+    READLINE_LINE=$BUFFER
+    READLINE_POINT=$#BUFFER
+  }
+  bind -x '"\C-r": peco-select-history'
+fi
+
+
