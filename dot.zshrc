@@ -201,15 +201,6 @@ peco-select-history(){
 zle -N peco-select-history
 bindkey '^r' peco-select-history
 
-
-s(){
-    if [ $# -eq 0 ]; then
-	screen -ls
-	return $?;
-    fi
-    screen -r $* || screen -S $*
-}
-
 # kubectl補完設定
 if [ $commands[kubectl] ]; then
   source <(kubectl completion zsh)
@@ -223,5 +214,20 @@ if [ -f $HOME/.zshrc.local ]; then
 fi
 
 function repo(){
-    cd $(ghq list -p | peco)
+    local dir
+    dir=$(ghq list -p | peco)
+    if [ -n "$dir" ]; then
+        cd $dir
+    fi
 }
+
+if [ -d $HOME/local/google-cloud-sdk/bin/ ]; then
+    export PATH=$PATH:$HOME/local/google-cloud-sdk/bin/
+fi
+
+if [ $commands[go] ]; then
+  export GOPATH=$HOME/dev
+  export PATH=$PATH:$GOPATH/bin
+fi
+
+

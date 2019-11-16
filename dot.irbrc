@@ -8,4 +8,5 @@ IRB.conf[:AUTO_INDENT]  = true
 require 'rubygems'
 require 'pp'
 require 'time'
+require 'base64'
 EOS

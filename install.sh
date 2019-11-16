@@ -20,12 +20,27 @@ do
     dstfile=$HOME/$(echo $file | sed -e 's/^dot//g')
 
     if [ -e $dstfile -o -L $dstfile ]; then
-	if [ $force -eq 0 ]; then
-	    echo "File exists : $dstfile"
-	    continue
-	fi
-	rm -rf $dstfile
+	    if [ $force -eq 0 ]; then
+	        echo "File exists : $dstfile"
+	        continue
+	    fi
+	    rm -rf $dstfile
     fi
 
     ln -s $srcfile $dstfile
 done
+
+for file in `echo vscode/*.json`; do
+    srcfile=$script_dir/$file
+    dstfile="$HOME/Library/Application Support/Code/User/$(basename $file)"
+    if [ -e "$dstfile" -o -L "$dstfile" ]; then
+        if [ $force -eq 0 ]; then
+            echo "File exists : $dstfile"
+            continue
+        fi
+        rm -rf "$dstfile"
+    fi
+
+    ln -s "$srcfile" "$dstfile"
+done
+

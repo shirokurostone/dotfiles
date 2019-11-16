@@ -1,0 +1,5 @@
+{
+    "go.gopath": "~/dev",
+    "go.formatTool": "goimports",
+    "workbench.iconTheme": "vscode-icons"
+}
