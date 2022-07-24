@@ -189,9 +189,10 @@ fi
 
 workspace(){
   mkdir -p ~/workspace/$(date '+%Y-%m-%d')
-  cd ~/workspace/$(date '+%Y-%m-%d')
+  cd "$HOME/workspace/$( ls -1 ~/workspace/ | sort -r | fzf --reverse --preview 'ls -alh ~/workspace/{}' )"
   pwd
 }
+
 
 peco-select-history(){
   BUFFER=$(history -n 1 | tail -r | peco --query "$LBUFFER")
@@ -230,4 +231,21 @@ if [ $commands[go] ]; then
   export PATH=$PATH:$GOPATH/bin
 fi
 
+function gcd(){
+    local _toplevel=$(git rev-parse --show-toplevel 2> /dev/null)
+    if [ -n "${_toplevel}" ]; then
+        local _cddir=$( ( cd "${_toplevel}"; echo "."; git ls-tree -dr --name-only HEAD ) | fzf --reverse --height '50%' --prompt "${_toplevel} > " --query="$*")
+        if [ -n "${_cddir}" ]; then
+            echo "${_toplevel}/${_cddir}"
+            cd "${_toplevel}/${_cddir}"
+        fi
+    fi
+}
 
+function ccd(){
+    local _cddir=$((echo "."; echo ".."; ls -1F | grep "/$" ) | fzf --reverse --height '50%' --prompt "$(pwd) > ")
+    while [ -n "${_cddir}" -a "${_cddir}" != "." ]; do
+        cd "${_cddir}"
+        _cddir=$((echo "."; echo ".."; ls -1F | grep "/$" ) | fzf --reverse --height '50%' --prompt "$(pwd) > ")
+    done
+}
