@@ -1,0 +1,20 @@
+
+[alias]
+diffs = !git -c 'delta.side-by-side=true' diff
+
+[core]
+pager = delta
+
+[init]
+defaultBranch = main
+
+[ghq]
+root = ~/Projects
+
+[delta]
+line-numbers = true
+side-by-side = false
+
+[include]
+path = "~/.gitconfig.local"
+
