@@ -83,27 +83,40 @@ fi
 # https://qiita.com/mollifier/items/8d5a627d773758dd8078
 if is-at-least 4.3.10; then
   autoload -Uz vcs_info
-  zstyle ':vcs_info:git:*' formats '%s:%b' '%c%u%m'
+  zstyle ':vcs_info:git:*' formats '%b' '%c%u%m'
   zstyle ':vcs_info:git:*' check-for-changes true
   zstyle ':vcs_info:git:*' stagedstr "+"
   zstyle ':vcs_info:git:*' unstagedstr "*"
 
-  function _update_vcs_info_msg(){
-    local vcs_message
-    LANG=en_US.UTF-8 vcs_info
-    if [[ -z ${vcs_info_msg_0_} ]]; then
-      vcs_message=""
+  function _transition(){
+    local delimiter=$'\UE0B0'
+    local from_bg="$1"
+    local to_bg="$2"
+    local to_fg="$3"
+
+    if [ -z "${to_bg}" -o -z "${to_fg}" ]; then
+      echo -n "%F{${from_bg}}%k${delimiter}%f"
     else
-      vcs_message=" ("
-	  LANG=en_US.UTF-8 vcs_info
-	  [[ -n "$vcs_info_msg_0_" ]] && vcs_message="${vcs_message}${vcs_info_msg_0_}"
-	  [[ -n "$vcs_info_msg_1_" ]] && vcs_message="${vcs_message}${vcs_info_msg_1_}"
-	  [[ -n "$vcs_info_msg_2_" ]] && vcs_message="${vcs_message}${vcs_info_msg_2_}"
-      vcs_message="${vcs_message})"
+      echo -n "%F{${from_bg}}%K{${to_bg}}${delimiter}%F{${to_fg}}"
+    fi
+  }
+
+  function _update_vcs_info_msg(){
+    local delimiter=$'\UE0B0'
+    local vcs_message
+
+    LANG=en_US.UTF-8 vcs_info
+    if [ -z "${vcs_info_msg_0_}" ]; then
+      vcs_message="$(_transition 237 150 237) %F{150}"
+    elif [ -z "$vcs_info_msg_1_" -a -z "$vcs_info_msg_2_" ]; then
+      vcs_message="$(_transition 237 150 237) ${vcs_info_msg_0_}%F{150}"
+    else
+      vcs_message="$(_transition 237 9 237) ${vcs_info_msg_0_}${vcs_info_msg_1_}${vcs_info_msg_2_}%F{9}"
     fi
 
-    PROMPT="[%F{green}%n%f@%F{cyan}%m%f]%F{magenta}${vcs_message}%f [%*] %F{yellow}%d%f
+    PROMPT="%K{31}%F{15}%*$(_transition 31 237 250) %~${vcs_message}%(?.%K{237}${delimiter}%F{250} %? $(_transition 237).%K{160}${delimiter}%F{15} %? $(_transition 160))%k%f
 %# "
+
   }
   add-zsh-hook precmd _update_vcs_info_msg
 fi
