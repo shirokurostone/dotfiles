@@ -184,6 +184,28 @@ if [ -d $HOME/local/bin ]; then
     export PATH=$PATH:$HOME/local/bin
 fi
 
+if [ -d $HOME/.cargo/bin ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
+if [ -d $HOME/local/google-cloud-sdk/bin/ ]; then
+    export PATH=$PATH:$HOME/local/google-cloud-sdk/bin/
+fi
+
+if [ $commands[go] ]; then
+  export GOPATH=$HOME/Projects
+  export PATH=$PATH:$GOPATH/bin
+fi
+
+if [ $commands[rbenv] ]; then
+  eval "$(rbenv init - zsh)"
+fi
+
+# kubectl補完設定
+if [ $commands[kubectl] ]; then
+  source <(kubectl completion zsh)
+fi
+
 ########################################
 # 関数
 
@@ -193,45 +215,23 @@ workspace(){
   pwd
 }
 
-
-peco-select-history(){
-  BUFFER=$(history -n 1 | tail -r | peco --query "$LBUFFER")
+fzf-select-history(){
+  BUFFER=$(history -n 1 | tail -r | fzf --reverse --prompt "> " --query "$LBUFFER")
   CURSOUR=$#BUFFER
   zle clear-screen
 }
-zle -N peco-select-history
-bindkey '^r' peco-select-history
-
-# kubectl補完設定
-if [ $commands[kubectl] ]; then
-  source <(kubectl completion zsh)
-fi
-
-########################################
-# local設定
-
-if [ -f $HOME/.zshrc.local ]; then
-    source $HOME/.zshrc.local
-fi
+zle -N fzf-select-history
+bindkey '^r' fzf-select-history
 
 function repo(){
     local dir
-    dir=$(ghq list -p | peco)
+    dir=$(ghq list -p | fzf --reverse --prompt "> " --preview "ls -lh '{}'" --preview-window 'down:50%' )
     if [ -n "$dir" ]; then
         cd $dir
     fi
 }
 
-if [ -d $HOME/local/google-cloud-sdk/bin/ ]; then
-    export PATH=$PATH:$HOME/local/google-cloud-sdk/bin/
-fi
-
-if [ $commands[go] ]; then
-  export GOPATH=$HOME/dev
-  export PATH=$PATH:$GOPATH/bin
-fi
-
-function gcd(){
+function cdg(){
     local _toplevel=$(git rev-parse --show-toplevel 2> /dev/null)
     if [ -n "${_toplevel}" ]; then
         local _cddir=$( ( cd "${_toplevel}"; echo "."; git ls-tree -dr --name-only HEAD ) | fzf --reverse --height '50%' --prompt "${_toplevel} > " --query="$*")
@@ -242,10 +242,18 @@ function gcd(){
     fi
 }
 
-function ccd(){
+function cdc(){
     local _cddir=$((echo "."; echo ".."; ls -1F | grep "/$" ) | fzf --reverse --height '50%' --prompt "$(pwd) > ")
     while [ -n "${_cddir}" -a "${_cddir}" != "." ]; do
         cd "${_cddir}"
         _cddir=$((echo "."; echo ".."; ls -1F | grep "/$" ) | fzf --reverse --height '50%' --prompt "$(pwd) > ")
     done
 }
+
+########################################
+# local設定
+
+if [ -f $HOME/.zshrc.local ]; then
+    source $HOME/.zshrc.local
+fi
+
