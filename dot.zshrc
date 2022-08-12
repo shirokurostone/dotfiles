@@ -72,8 +72,8 @@ bindkey '^N' history-beginning-search-forward
 # globを含めるインクリメンタル検索
 # http://subtech.g.hatena.ne.jp/secondlife/20110222/1298354852
 if is-at-least 4.3.10; then
-    bindkey '^R' history-incremental-pattern-search-backward
-    bindkey '^S' history-incremental-pattern-search-forward
+  bindkey '^R' history-incremental-pattern-search-backward
+  bindkey '^S' history-incremental-pattern-search-forward
 fi
 
 
@@ -114,7 +114,7 @@ if is-at-least 4.3.10; then
       vcs_message="$(_transition 237 9 237) ${vcs_info_msg_0_}${vcs_info_msg_1_}${vcs_info_msg_2_}%F{9}"
     fi
 
-    PROMPT="%K{31}%F{15}%*$(_transition 31 237 250) %~${vcs_message}%(?.%K{237}${delimiter}%F{250} %? $(_transition 237).%K{160}${delimiter}%F{15} %? $(_transition 160))%k%f
+    PROMPT="%K{31}%F{15}%*$(_transition 31 237 250) %~${vcs_message}%(?.%K{237}${delimiter}%F{250} %? $(_transition 237).%K{160}${delimiter}%F{15} %? $(_transition 160))%k%f%E
 %# "
 
   }
@@ -132,12 +132,12 @@ export LSCOLORS=Exfxcxdxbxegedabagacad
 export LS_COLORS='di=34;01:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30'
 
 case "$OSTYPE" in
-    darwin* | FreeBSD*)
-	alias ls="ls -G"
-	;;
-    linux*)
-	alias ls="ls --color=auto"
-	;;
+  darwin* | FreeBSD*)
+    alias ls="ls -G"
+    ;;
+  linux*)
+    alias ls="ls --color=auto"
+    ;;
 esac
 zstyle ':completion:*' list-colors 'di=34;01' 'ln=35' 'so=32' 'ex=31' 'bd=46;34' 'cd=43;34'
 
@@ -152,6 +152,18 @@ alias lla='ls -alh'
 alias sl='ls'
 alias e='emacs'
 alias j='jobs'
+alias v="vim ."
+
+alias g="git"
+alias k="kubectl"
+alias kg="kubectl get"
+
+alias gs="git status"
+alias gf="git fetch"
+alias ga="git add"
+alias gp="git push"
+alias gd="git diff"
+alias gl="git log"
 
 
 ########################################
@@ -189,25 +201,25 @@ export LESS="-R --LONG-PROMPT "
 export LANG=ja_JP.UTF-8
 
 # PATH
-if [ -d $HOME/bin ]; then
-    export PATH=$PATH:$HOME/bin
+if [ -d "$HOME/bin" ]; then
+  export PATH="$PATH:$HOME/bin"
 fi
 
-if [ -d $HOME/local/bin ]; then
-    export PATH=$PATH:$HOME/local/bin
+if [ -d "$HOME/local/bin" ]; then
+  export PATH="$PATH:$HOME/local/bin"
 fi
 
-if [ -d $HOME/.cargo/bin ]; then
-    export PATH="$HOME/.cargo/bin:$PATH"
+if [ -d "$HOME/.cargo/bin" ]; then
+  export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-if [ -d $HOME/local/google-cloud-sdk/bin/ ]; then
-    export PATH=$PATH:$HOME/local/google-cloud-sdk/bin/
+if [ -d "$HOME/local/google-cloud-sdk/bin/" ]; then
+  export PATH="$PATH:$HOME/local/google-cloud-sdk/bin/"
 fi
 
 if [ $commands[go] ]; then
-  export GOPATH=$HOME/Projects
-  export PATH=$PATH:$GOPATH/bin
+  export GOPATH="$HOME/Projects"
+  export PATH="$PATH:$GOPATH/bin"
 fi
 
 if [ $commands[rbenv] ]; then
@@ -237,36 +249,36 @@ zle -N fzf-select-history
 bindkey '^r' fzf-select-history
 
 function repo(){
-    local dir
-    dir=$(ghq list -p | fzf --reverse --prompt "> " --preview "ls -lh '{}'" --preview-window 'down:50%' )
-    if [ -n "$dir" ]; then
-        cd $dir
-    fi
+  local dir
+  dir=$(ghq list -p | fzf --reverse --prompt "> " --preview "ls -lh '{}'" --preview-window 'down:50%' )
+  if [ -n "$dir" ]; then
+    cd $dir
+  fi
 }
 
 function cdg(){
-    local _toplevel=$(git rev-parse --show-toplevel 2> /dev/null)
-    if [ -n "${_toplevel}" ]; then
-        local _cddir=$( ( cd "${_toplevel}"; echo "."; git ls-tree -dr --name-only HEAD ) | fzf --reverse --height '50%' --prompt "${_toplevel} > " --query="$*")
-        if [ -n "${_cddir}" ]; then
-            echo "${_toplevel}/${_cddir}"
-            cd "${_toplevel}/${_cddir}"
-        fi
+  local _toplevel=$(git rev-parse --show-toplevel 2> /dev/null)
+  if [ -n "${_toplevel}" ]; then
+    local _cddir=$( ( cd "${_toplevel}"; echo "."; git ls-tree -dr --name-only HEAD ) | fzf --reverse --height '50%' --prompt "${_toplevel} > " --query="$*")
+    if [ -n "${_cddir}" ]; then
+      echo "${_toplevel}/${_cddir}"
+      cd "${_toplevel}/${_cddir}"
     fi
+  fi
 }
 
 function cdc(){
-    local _cddir=$((echo "."; echo ".."; ls -1F | grep "/$" ) | fzf --reverse --height '50%' --prompt "$(pwd) > ")
-    while [ -n "${_cddir}" -a "${_cddir}" != "." ]; do
-        cd "${_cddir}"
-        _cddir=$((echo "."; echo ".."; ls -1F | grep "/$" ) | fzf --reverse --height '50%' --prompt "$(pwd) > ")
-    done
+  local _cddir=$((echo "."; echo ".."; ls -1F | grep "/$" ) | fzf --reverse --height '50%' --prompt "$(pwd) > ")
+  while [ -n "${_cddir}" -a "${_cddir}" != "." ]; do
+    cd "${_cddir}"
+    _cddir=$((echo "."; echo ".."; ls -1F | grep "/$" ) | fzf --reverse --height '50%' --prompt "$(pwd) > ")
+  done
 }
 
 ########################################
 # local設定
 
-if [ -f $HOME/.zshrc.local ]; then
-    source $HOME/.zshrc.local
+if [ -f "$HOME/.zshrc.local" ]; then
+  source "$HOME/.zshrc.local"
 fi
 
