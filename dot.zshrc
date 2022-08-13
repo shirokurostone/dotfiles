@@ -80,6 +80,18 @@ fi
 ########################################
 # プロンプト
 
+# kube-ps1
+if [ -f /opt/homebrew/opt/kube-ps1/share/kube-ps1.sh ]; then
+  source "/opt/homebrew/opt/kube-ps1/share/kube-ps1.sh"
+  export KUBE_PS1_PREFIX=""
+  export KUBE_PS1_SUFFIX=""
+  export KUBE_PS1_SYMBOL_ENABLE=false
+  export KUBE_PS1_PREFIX_COLOR=black
+  export KUBE_PS1_SUFFIX_COLOR=black
+  export KUBE_PS1_CTX_COLOR=black
+  export KUBE_PS1_NS_COLOR=black
+fi
+
 # https://qiita.com/mollifier/items/8d5a627d773758dd8078
 if is-at-least 4.3.10; then
   autoload -Uz vcs_info
@@ -107,14 +119,14 @@ if is-at-least 4.3.10; then
 
     LANG=en_US.UTF-8 vcs_info
     if [ -z "${vcs_info_msg_0_}" ]; then
-      vcs_message="$(_transition 237 150 237) %F{150}"
+      vcs_message="$(_transition 237 2 237) $(_transition 2 250 237)"
     elif [ -z "$vcs_info_msg_1_" -a -z "$vcs_info_msg_2_" ]; then
-      vcs_message="$(_transition 237 150 237) ${vcs_info_msg_0_}%F{150}"
+      vcs_message="$(_transition 237 2 237) ${vcs_info_msg_0_} $(_transition 2 250 237)"
     else
-      vcs_message="$(_transition 237 9 237) ${vcs_info_msg_0_}${vcs_info_msg_1_}${vcs_info_msg_2_}%F{9}"
+      vcs_message="$(_transition 237 9 237) ${vcs_info_msg_0_}${vcs_info_msg_1_}${vcs_info_msg_2_} $(_transition 9 250 237)"
     fi
 
-    PROMPT="%K{31}%F{15}%*$(_transition 31 237 250) %~${vcs_message}%(?.%K{237}${delimiter}%F{250} %? $(_transition 237).%K{160}${delimiter}%F{15} %? $(_transition 160))%k%f%E
+    PROMPT="%K{31}%F{15}%*$(_transition 31 237 250) %~ ${vcs_message} $(kube_ps1) %(?.$(_transition 250 237 250) %? $(_transition 237).$(_transition 250 160 15) %? $(_transition 160))%k%f%E
 %# "
 
   }

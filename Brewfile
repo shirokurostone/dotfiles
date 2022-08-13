@@ -28,6 +28,8 @@ brew 'kind'
 brew 'kubectx'
 brew 'kubernetes-cli'
 brew 'stern'
+brew 'kustomize'
+brew 'kube-ps1'
 
 # cli tool
 brew 'bat'
