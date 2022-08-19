@@ -253,7 +253,7 @@ workspace(){
 }
 
 fzf-select-history(){
-  BUFFER=$(history -n 1 | fzf --reverse --prompt "> " --query "$LBUFFER" --tac --no-sort)
+  BUFFER=$(history -n 1 | fzf --reverse --prompt "> " --query "$LBUFFER" --tac --no-sort --exact)
   CURSOUR=$#BUFFER
   zle clear-screen
 }
