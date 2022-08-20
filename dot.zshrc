@@ -76,6 +76,9 @@ if is-at-least 4.3.10; then
   bindkey '^S' history-incremental-pattern-search-forward
 fi
 
+bindkey '^[^[[D' backward-word # Alt + ←
+bindkey '^[^[[C' forward-word  # Alt + →
+
 
 ########################################
 # プロンプト
