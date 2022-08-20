@@ -314,6 +314,39 @@ function cdc(){
   done
 }
 
+function title(){
+  local t=$1
+  echo -e "\e]0;${t}\a"
+}
+
+function iterm2_foreground(){
+  echo -e "\e]1337;StealFocus\a"
+}
+
+function iterm2_post_notification(){
+  local message=$1
+  echo -e "\e]9;${message}\a"
+}
+
+function iterm2_change_profile(){
+  local profile=$1
+  echo -e "\e]1337;SetProfile=${profile}\a"
+}
+
+function iterm2_tab_color(){
+  local red=$1
+  local green=$2
+  local blue=$3
+
+  if [ $# -eq 3 ]; then
+    echo -e "\e]6;1;bg;red;brightness;${red}\a"
+    echo -e "\e]6;1;bg;green;brightness;${green}\a"
+    echo -e "\e]6;1;bg;blue;brightness;${blue}\a"
+  else
+    echo -e "\e]6;1;bg;*;default\a"
+  fi
+}
+
 ########################################
 # local設定
 
