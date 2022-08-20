@@ -100,35 +100,59 @@ if is-at-least 4.3.10; then
   zstyle ':vcs_info:git:*' stagedstr "+"
   zstyle ':vcs_info:git:*' unstagedstr "*"
 
-  function _transition(){
-    local delimiter=$'\UE0B0'
-    local from_bg="$1"
-    local to_bg="$2"
-    local to_fg="$3"
-
-    if [ -z "${to_bg}" -o -z "${to_fg}" ]; then
-      echo -n "%F{${from_bg}}%k${delimiter}%f"
-    else
-      echo -n "%F{${from_bg}}%K{${to_bg}}${delimiter}%F{${to_fg}}"
-    fi
-  }
-
   function _update_vcs_info_msg(){
-    local delimiter=$'\UE0B0'
-    local vcs_message
+    local -a segments
+    local -a fgs
+    local -a bgs
 
+    # timestamp
+    segments+=('%*')
+    fgs+=(15)
+    bgs+=(31)
+
+    # cwd
+    segments+=(' %~ ')
+    fgs+=(250)
+    bgs+=(237)
+
+    # vsc
     LANG=en_US.UTF-8 vcs_info
     if [ -z "${vcs_info_msg_0_}" ]; then
-      vcs_message="$(_transition 237 2 237) $(_transition 2 250 237)"
+      segments+=(" ")
+      fgs+=(237)
+      bgs+=(2)
     elif [ -z "$vcs_info_msg_1_" -a -z "$vcs_info_msg_2_" ]; then
-      vcs_message="$(_transition 237 2 237) ${vcs_info_msg_0_} $(_transition 2 250 237)"
+      segments+=(" ${vcs_info_msg_0_} ")
+      fgs+=(237)
+      bgs+=(2)
     else
-      vcs_message="$(_transition 237 9 237) ${vcs_info_msg_0_}${vcs_info_msg_1_}${vcs_info_msg_2_} $(_transition 9 250 237)"
+      segments+=(" ${vcs_info_msg_0_}${vcs_info_msg_1_}${vcs_info_msg_2_} ")
+      fgs+=(237)
+      bgs+=(9)
     fi
 
-    PROMPT="%K{31}%F{15}%*$(_transition 31 237 250) %~ ${vcs_message} $(kube_ps1) %(?.$(_transition 250 237 250) %? $(_transition 237).$(_transition 250 160 15) %? $(_transition 160))%k%f%E
-%# "
+    # kube-ps1
+    segments+=(" $(kube_ps1) ")
+    fgs+=(237)
+    bgs+=(250)
 
+    # exit status
+    segments+=(" %? ")
+    fgs+=("%(?.250.15)")
+    bgs+=("%(?.237.160)")
+
+    # PROMPT構築
+    local delimiter=$'\UE0B0'
+    local p
+    for i in {1..${#segments}}; do
+      if [ $i -eq 1 ]; then
+        p="%K{${bgs[$i]}}%F{${fgs[$i]}}${segments[$i]}%F{${bgs[$i]}}"
+      else
+        p="${p}%K{${bgs[$i]}}${delimiter}%F{${fgs[$i]}}${segments[$i]}%F{${bgs[$i]}}"
+      fi
+    done
+    PROMPT="${p}%k${delimiter}%f%k%E
+%# "
   }
   add-zsh-hook precmd _update_vcs_info_msg
 fi
