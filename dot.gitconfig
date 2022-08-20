@@ -14,6 +14,9 @@ root = ~/Projects
 [delta]
 line-numbers = true
 side-by-side = false
+line-numbers-minus-style = "#ff8080"
+line-numbers-zero-style  = "#a0a0a0"
+line-numbers-plus-style  = "#80ff80"
 
 [include]
 path = "~/.gitconfig.local"
