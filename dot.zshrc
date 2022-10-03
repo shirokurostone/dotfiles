@@ -280,12 +280,51 @@ workspace(){
 }
 
 fzf-select-history(){
-  BUFFER=$(history -n 1 | fzf --reverse --prompt "> " --query "$LBUFFER" --tac --no-sort --exact)
+  BUFFER=$(
+    history -n 1 \
+    | fzf --prompt "> " --query "$LBUFFER" \
+        --reverse --tac --no-sort --exact --bind=ctrl-z:ignore --height 50%
+  )
   CURSOUR=$#BUFFER
-  zle clear-screen
+  zle reset-prompt
 }
 zle -N fzf-select-history
 bindkey '^r' fzf-select-history
+
+fzf-select-file(){
+  # 参考
+  # https://github.com/junegunn/fzf/blob/master/shell/key-bindings.zsh
+  list=$(
+    fd -L -c always . \
+    | fzf --prompt "select files> " \
+        --ansi --reverse --no-sort --exact --bind=ctrl-z:ignore --height 50% -m  \
+    | while read f; do
+        echo -n "${(q)f} ";
+      done
+  )
+
+  LBUFFER="${LBUFFER}${list}"
+  zle reset-prompt
+}
+zle -N fzf-select-file
+bindkey '^t' fzf-select-file
+
+fzf-select-git-file(){
+  list=$(
+    git status -s \
+    | fzf --prompt "git status> " \
+        --ansi --reverse --no-sort --exact --bind=ctrl-z:ignore --height 50% -m  \
+    | while read f; do
+        f2=$(echo "${f}" | sed -e 's/^[ MTADRCU!?]* //')
+        echo -n "${(q)f2} "
+      done
+  )
+
+  LBUFFER="${LBUFFER}${list}"
+  zle reset-prompt
+}
+zle -N fzf-select-git-file
+bindkey '^s' fzf-select-git-file
 
 function repo(){
   local dir
