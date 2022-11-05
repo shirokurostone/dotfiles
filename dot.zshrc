@@ -287,7 +287,7 @@ fzf-select-history(){
     | fzf --prompt "> " --query "$LBUFFER" \
         --reverse --tac --no-sort --exact --bind=ctrl-z:ignore --height 50%
   )
-  CURSOUR=$#BUFFER
+  CURSOR=$#BUFFER
   zle reset-prompt
 }
 zle -N fzf-select-history
