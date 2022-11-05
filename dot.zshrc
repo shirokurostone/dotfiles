@@ -309,7 +309,7 @@ fzf-select-file(){
   zle reset-prompt
 }
 zle -N fzf-select-file
-bindkey '^t' fzf-select-file
+bindkey '^s^s' fzf-select-file
 
 fzf-select-git-file(){
   list=$(
@@ -326,7 +326,7 @@ fzf-select-git-file(){
   zle reset-prompt
 }
 zle -N fzf-select-git-file
-bindkey '^s' fzf-select-git-file
+bindkey '^s^g' fzf-select-git-file
 
 function repo(){
   local dir

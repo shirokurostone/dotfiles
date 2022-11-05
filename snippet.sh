@@ -81,4 +81,4 @@ fzf-select-snippet(){
   zle reset-prompt
 }
 zle -N fzf-select-snippet
-bindkey '^s' fzf-select-snippet
+bindkey '^s^n' fzf-select-snippet
