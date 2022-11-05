@@ -273,6 +273,8 @@ fi
 ########################################
 # 関数
 
+source  "$(dirname $(readlink ~/.zshrc))/snippet.sh"
+
 workspace(){
   mkdir -p ~/workspace/$(date '+%Y-%m-%d')
   cd "$HOME/workspace/$( ls -1 ~/workspace/ | sort -r | fzf --reverse --preview 'ls -alh ~/workspace/{}' )"
