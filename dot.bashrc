@@ -1,13 +1,33 @@
 
 ########################################
+# 外部ファイル読み込み
+if [ -f /etc/bash_completion ]; then
+  source /etc/bash_completion
+fi
+
+if [ -f /usr/share/git-core/contrib/completion/git-prompt.sh ]; then
+  source /usr/share/git-core/contrib/completion/git-prompt.sh
+fi
+
+if [ -f /opt/homebrew/etc/bash_completion.d/git-prompt.sh ]; then
+  source /opt/homebrew/etc/bash_completion.d/git-prompt.sh
+fi
+
+if [ -f /opt/homebrew/etc/bash_completion.d/git-completion.bash ]; then
+  source /opt/homebrew/etc/bash_completion.d/git-completion.bash
+fi
+
+########################################
+# 共通設定
+source  "$(dirname $(readlink ~/.zshrc))/common_config.sh"
+
+########################################
 # シェル変数・環境変数
 
 #PS1="[\u@\h \W]\$ "
 #PS1='[\[\e[32m\u\e[0m\]@\[\e[36m\h\e[0m\]]\[\e[35m${vcs_message}\e[0m\] [\t] \[\e[33m\w\e[0m\]\n\$ '
 PS1='[\[\e[32m\u\e[0m\]@\[\e[36m\h\e[0m\]] [\t] \[\e[33m\w\e[0m\]\n\$ '
 
-source /opt/homebrew/etc/bash_completion.d/git-prompt.sh
-source /opt/homebrew/etc/bash_completion.d/git-completion.bash
 GIT_PS1_SHOWDIRTYSTATE=yes
 GIT_PS1_SHOWCONFLICTSTATE=yes
 
@@ -57,50 +77,51 @@ SAVEHIST=1000000
 FIGNORE=${FIGNORE}:.svn:.git:.hg:CVS
 
 ########################################
-# alias
-
-alias l='ls'
-alias ll='ls -lh'
-alias la='ls -a'
-alias lla='ls -alh'
-alias sl='ls'
-
-
-########################################
-# ls
-export LSCOLORS=Exfxcxdxbxegedabagacad
-export LS_COLORS='di=34;01:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30'
-
-case "$OSTYPE" in
-    darwin* | FreeBSD*)
-	alias ls="ls -G"
-	;;
-    linux*)
-	alias ls="ls --color=auto"
-	;;
-esac
-
-########################################
-# bash completion 
-
-if [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-fi
-
-
-########################################
 # local設定
 
 if [ -f $HOME/.bashrc.local ]; then
     source $HOME/.bashrc.local
 fi
 
-if `which peco > /dev/null 2>& 1`; then
-  peco-select-history(){
-    BUFFER=$(history | history | sed -e 's/^ *[0-9]* *//g' | tail -r | peco --query "$LBUFFER")
-    READLINE_LINE=$BUFFER
-    READLINE_POINT=$#BUFFER
-  }
-  bind -x '"\C-r": peco-select-history'
-fi
+workspace(){
+  mkdir -p ~/workspace/$(date '+%Y-%m-%d')
+  if which fzf > /dev/null 2>&1; then
+    cd "$HOME/workspace/$( ls -1 ~/workspace/ | sort -r | fzf --reverse --preview 'ls -alh ~/workspace/{}' )"
+  else
+    cd ~/workspace/$(date '+%Y-%m-%d')
+  fi
+  pwd
+}
 
+repo(){
+  local match=$(cd ~/Projects; find * -maxdepth 4 -name .git -exec dirname \{\} \; | grep -c "$1")
+  if [ "${match}" -eq 1 ]; then
+    cd "$HOME/Projects/$(cd ~/Projects; find * -maxdepth 4 -name .git -exec dirname \{\} \; | grep "$1")"
+  else
+    (cd ~/Projects; find * -maxdepth 4 -name .git -exec dirname \{\} \; | grep "$1")
+  fi
+}
+
+_repo(){
+  _get_comp_words_by_ref cur prev
+  local repos="$(cd ~/Projects; find * -maxdepth 4 -name .git -exec dirname \{\} \;)"
+  COMPREPLY=( $(compgen -W "${repos}" -- "${cur}") )
+}
+complete -F _repo repo
+
+cdg(){
+  local _toplevel=$(git rev-parse --show-toplevel 2> /dev/null)
+  if [ -n "${_toplevel}" ]; then
+    if [ -d "${_toplevel}/${1}" ]; then
+      cd "${_toplevel}/${1}"
+    fi
+  fi
+}
+
+_cdg(){
+  _get_comp_words_by_ref cur prev
+  local _toplevel=$(git rev-parse --show-toplevel 2> /dev/null)
+  local dirs="$(cd "${_toplevel}"; find * -type d)"
+  COMPREPLY=( $(compgen -W "${dirs}" -- "${cur}") )
+}
+complete -F _cdg cdg

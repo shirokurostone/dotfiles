@@ -79,6 +79,9 @@ fi
 bindkey '^[^[[D' backward-word # Alt + ←
 bindkey '^[^[[C' forward-word  # Alt + →
 
+########################################
+# 共通設定
+source  "$(dirname $(readlink ~/.zshrc))/common_config.sh"
 
 ########################################
 # プロンプト
@@ -166,43 +169,8 @@ RPROMPT=""
 
 
 ########################################
-# ls
-export LSCOLORS=Exfxcxdxbxegedabagacad
-export LS_COLORS='di=34;01:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30'
 
-case "$OSTYPE" in
-  darwin* | FreeBSD*)
-    alias ls="ls -G"
-    ;;
-  linux*)
-    alias ls="ls --color=auto"
-    ;;
-esac
-zstyle ':completion:*' list-colors 'di=34;01' 'ln=35' 'so=32' 'ex=31' 'bd=46;34' 'cd=43;34'
-
-
-########################################
-# alias
-
-alias l='ls'
-alias ll='ls -lh'
-alias la='ls -a'
-alias lla='ls -alh'
-alias sl='ls'
-alias e='emacs'
-alias j='jobs'
-alias v="vim ."
-
-alias g="git"
-alias k="kubectl"
-alias kg="kubectl get"
-
-alias gs="git status"
-alias gf="git fetch"
-alias ga="git add"
-alias gp="git push"
-alias gd="git diff"
-alias gl="git log"
+zstyle ':completion:*' list-colors "${LS_COLORS}"
 
 
 ########################################
@@ -213,40 +181,6 @@ REPORTTIME=10;
 HISTFILE=~/.zsh_history
 HISTSIZE=1000000
 SAVEHIST=1000000
-
-# grepオプション
-export GREP_OPTIONS="--color=auto"
-export GREP_COLOR='31;01'
-
-# Mercurialの文字コード
-export HGENCODING=utf-8
-
-# エディタ
-export EDITOR=vim
-
-# svn用エディタ
-export SVN_EDITOR=vim
-
-# git用エディタ
-export GIT_EDITOR=vim
-
-# lessの文字コード
-export LESSCHARSET=utf-8
-
-# lessオプション
-export LESS="-R --LONG-PROMPT "
-
-# 言語環境
-export LANG=ja_JP.UTF-8
-
-# PATH
-if [ -d "$HOME/bin" ]; then
-  export PATH="$PATH:$HOME/bin"
-fi
-
-if [ -d "$HOME/local/bin" ]; then
-  export PATH="$PATH:$HOME/local/bin"
-fi
 
 if [ -d "$HOME/.cargo/bin" ]; then
   export PATH="$HOME/.cargo/bin:$PATH"
@@ -272,14 +206,7 @@ fi
 
 ########################################
 # 関数
-
 source  "$(dirname $(readlink ~/.zshrc))/snippet.sh"
-
-workspace(){
-  mkdir -p ~/workspace/$(date '+%Y-%m-%d')
-  cd "$HOME/workspace/$( ls -1 ~/workspace/ | sort -r | fzf --reverse --preview 'ls -alh ~/workspace/{}' )"
-  pwd
-}
 
 fzf-select-history(){
   BUFFER=$(
