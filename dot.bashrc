@@ -6,6 +6,50 @@
 #PS1='[\[\e[32m\u\e[0m\]@\[\e[36m\h\e[0m\]]\[\e[35m${vcs_message}\e[0m\] [\t] \[\e[33m\w\e[0m\]\n\$ '
 PS1='[\[\e[32m\u\e[0m\]@\[\e[36m\h\e[0m\]] [\t] \[\e[33m\w\e[0m\]\n\$ '
 
+source /opt/homebrew/etc/bash_completion.d/git-prompt.sh
+source /opt/homebrew/etc/bash_completion.d/git-completion.bash
+GIT_PS1_SHOWDIRTYSTATE=yes
+GIT_PS1_SHOWCONFLICTSTATE=yes
+
+function _setup_prompt(){
+  local -a segments
+  local -a fgs
+  local -a bgs
+
+  # timestamp
+  segments+=('\t')
+  fgs+=(15)
+  bgs+=(31)
+
+  # hostname
+  segments+=(' \h ')
+  fgs+=(232)
+  bgs+=(220)
+
+  # cwd
+  segments+=(' \w ')
+  fgs+=(250)
+  bgs+=(237)
+
+  # git
+  segments+=(' $(__git_ps1) ')
+  fgs+=(237)
+  bgs+=(9)
+
+  local p
+  local delimiter=$'\xee\x82\xb0' # U+E0B0
+  local last_index=$(( ${#segments[*]} - 1 ))
+  for i in $(seq 0 ${last_index}); do
+    if [ $i -eq 0 ]; then
+      p="\e[48;5;${bgs[$i]}m\e[38;5;${fgs[$i]}m${segments[$i]}\e[38;5;${bgs[$i]}m"
+    else
+      p="${p}\e[48;5;${bgs[$i]}m${delimiter}\e[38;5;${fgs[$i]}m${segments[$i]}\e[38;5;${bgs[$i]}m"
+    fi
+  done
+  PS1="${p}\e[0m\e[38;5;${bgs[$last_index]}m${delimiter}\e[m\n\$ "
+}
+_setup_prompt
+
 HISTCONTROL="ignoreboth"
 HISTFILE=~/.bash_history
 HISTSIZE=1000000
@@ -36,20 +80,6 @@ case "$OSTYPE" in
 	;;
 esac
 
-
-########################################
-# SQL文誤爆防止
-
-alias CREATE='echo CREATE'
-alias SELECT='echo SELECT'
-alias INSERT='echo INSERT'
-alias UPDATE='echo UPDATE'
-alias DELETE='echo DELETE'
-alias DROP='echo DROP'
-alias EXPLAIN='echo EXPLAIN'
-alias WHERE='echo WHERE'
-alias FROM='echo FROM'
-
 ########################################
 # bash completion 
 
@@ -73,5 +103,4 @@ if `which peco > /dev/null 2>& 1`; then
   }
   bind -x '"\C-r": peco-select-history'
 fi
-
 
