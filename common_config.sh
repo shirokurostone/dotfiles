@@ -68,7 +68,7 @@ fi
 workspace(){
   mkdir -p ~/workspace/$(date '+%Y-%m-%d')
   if which fzf > /dev/null 2>&1; then
-    cd "$HOME/workspace/$( ls -1 ~/workspace/ | sort -r | fzf --reverse --preview 'ls -alh ~/workspace/{}' )"
+    cd "$HOME/workspace/$( ls -1 ~/workspace/ | sort -r | fzf --reverse --preview 'ls -a --color=always ~/workspace/{}' --preview-window 'right,75%,border-left' )"
   else
     cd ~/workspace/$(date '+%Y-%m-%d')
   fi

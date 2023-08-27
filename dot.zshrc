@@ -257,7 +257,7 @@ bindkey '^s^g' fzf-select-git-file
 
 function repo(){
   local dir
-  dir=$(ghq list -p | fzf --reverse --prompt "> " --preview "ls -lh '{}'" --preview-window 'down:50%' )
+  dir=$(ghq list -p | fzf --reverse --prompt "> " --preview "ls -alh --color=always '{}'" --preview-window 'down:50%' )
   if [ -n "$dir" ]; then
     cd $dir
   fi
