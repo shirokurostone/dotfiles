@@ -44,3 +44,17 @@ for file in `echo vscode/*.json`; do
     ln -s "$srcfile" "$dstfile"
 done
 
+for file in `echo iterm2/*.py`; do
+    srcfile=$script_dir/$file
+    dstfile="$HOME/Library/Application Support/iTerm2/Scripts/$(basename $file)"
+    if [ -e "$dstfile" -o -L "$dstfile" ]; then
+        if [ $force -eq 0 ]; then
+            echo "File exists : $dstfile"
+            continue
+        fi
+        rm -rf "$dstfile"
+    fi
+
+    ln -s "$srcfile" "$dstfile"
+done
+
