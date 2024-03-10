@@ -208,11 +208,27 @@ fi
 # 関数
 source  "$(dirname $(readlink ~/.zshrc))/snippet.sh"
 
+function _fzf_preview_window_option(){
+  if [ $(tput cols) -ge 150 ]; then
+    echo -n "right"
+  else
+    echo -n "down"
+  fi
+}
+
 fzf-select-history(){
   BUFFER=$(
-    history -n 1 \
-    | fzf --prompt "> " --query "$LBUFFER" \
-        --reverse --tac --no-sort --exact --bind=ctrl-z:ignore --height 50%
+    history -n 1 | bat --color always --language bash --theme OneHalfDark --style plain \
+    | fzf \
+      --prompt "> " \
+      --query "$LBUFFER" \
+      --ansi \
+      --reverse  \
+      --tac \
+      --no-sort \
+      --exact \
+      --bind 'ctrl-z:ignore' \
+      --height '50%' \
   )
   CURSOR=$#BUFFER
   zle reset-prompt
@@ -223,10 +239,20 @@ bindkey '^r' fzf-select-history
 fzf-select-file(){
   # 参考
   # https://github.com/junegunn/fzf/blob/master/shell/key-bindings.zsh
+  # https://github.com/junegunn/fzf?tab=readme-ov-file#2-switch-between-sources-by-pressing-ctrl-d-or-ctrl-f
   list=$(
-    fd -L -c always . \
-    | fzf --prompt "select files> " \
-        --ansi --reverse --no-sort --exact --bind=ctrl-z:ignore --height 50% -m  \
+    find . -name ".git" -prune -o -print | sed -e 's|^./||g' \
+    | fzf \
+      --ansi \
+      --reverse  \
+      --no-sort \
+      --exact \
+      --multi \
+      --bind 'ctrl-z:ignore' \
+      --bind 'ctrl-d:reload(find . -name ".git" -prune -o -type d -print | sed -e "s|^./||g")+change-prompt(dirs> )' \
+      --bind 'ctrl-f:reload(find . -name ".git" -prune -o -type f -print | sed -e "s|^./||g")+change-prompt(files> )' \
+      --height '50%' \
+      --prompt '> '\
     | while read f; do
         echo -n "${(q)f} ";
       done
@@ -236,28 +262,86 @@ fzf-select-file(){
   zle reset-prompt
 }
 zle -N fzf-select-file
-bindkey '^s^s' fzf-select-file
+bindkey '^t' fzf-select-file
 
-fzf-select-git-file(){
-  list=$(
-    git status -s \
-    | fzf --prompt "git status> " \
-        --ansi --reverse --no-sort --exact --bind=ctrl-z:ignore --height 50% -m  \
-    | while read f; do
-        f2=$(echo "${f}" | sed -e 's/^[ MTADRCU!?]* //')
-        echo -n "${(q)f2} "
-      done
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^s^t' edit-command-line
+
+function fzf-jq(){
+  jsonfile=$(mktemp)
+  export modefile=$(mktemp)
+  trap "rm -f ${jsonfile} ${modefile}" EXIT
+
+  cat > ${jsonfile}
+  echo -n "json" > ${modefile}
+
+ result=$(cat ${jsonfile} \
+    | (echo "."; jq -rc '[paths] | sort | .[] | map(if  . | type == "number" then . | tostring | "[" + . + "]" else . end ) | join(".") | "." + .' )\
+    | fzf \
+      --reverse  \
+      --prompt "[json]> " \
+      --query "." \
+      --bind 'tab:replace-query' \
+      --bind 'ctrl-w:backward-kill-word' \
+      --bind 'enter:print-query' \
+      --bind 'ctrl-t:transform:[[ $FZF_PROMPT =~ json ]] && (echo "query" > $modefile; echo "change-prompt([query]> )") || (echo "json" > $modefile; echo "change-prompt([json]> )" )' \
+      --preview "sleep 0.1; cat ${jsonfile} | jq --color-output {} " \
+      --preview-window "$(_fzf_preview_window_option)" \
   )
 
-  LBUFFER="${LBUFFER}${list}"
-  zle reset-prompt
+  if [[ "$(cat $modefile)" == "json" ]]; then
+    cat ${jsonfile} | jq "${result}"
+  else
+    echo ${result}
+  fi
+
 }
-zle -N fzf-select-git-file
-bindkey '^s^g' fzf-select-git-file
+
+function fzf-git-status(){
+  git -c color.ui=always status -s \
+    | fzf \
+      --ansi \
+      --reverse  \
+      --multi \
+      --prompt "> " \
+      --query "" \
+      --preview 'sleep 0.1; git -c color.ui=always diff $(echo {} | awk "{print \$2}") || true' \
+      --preview-window "$(_fzf_preview_window_option)" \
+    | sed -e "s/\x1b\[[^m]*m//g" \
+    | awk '{print $2}'
+}
+
+function fzf-git-branch(){
+  git branch -a --format="%(if)%(HEAD)%(then)%(color:bold green)%(end)%(align:20)%(refname:short)%(end) %(objectname:short) %(if)%(upstream)%(then) -> %(upstream:track)%(upstream:short)%(end)" --color=always \
+    | fzf \
+      --ansi \
+      --reverse  \
+      --prompt "> " \
+      --query "" \
+      --preview 'sleep 0.1; git log $(echo {} | sed -e "s/\x1b\[[^m]*m//g" | awk "{print \$1}") --color=always|| true' \
+      --preview-window "$(_fzf_preview_window_option)" \
+    | sed -e "s/\x1b\[[^m]*m//g" \
+    | awk '{print $1}'
+}
+
+function fzf-git-log(){
+  git log --format="format:%C(yellow)%h%Creset %as %C(green)%<(20,trunc)%cn%Creset %<(20,trunc)%s %d" --color=always\
+    | fzf \
+      --ansi \
+      --reverse  \
+      --multi \
+      --prompt "> " \
+      --query "" \
+      --preview 'sleep 0.1; git diff -u $(echo {} | sed -e "s/\x1b\[[^m]*m//g" | awk "{print \$1}") --color=always|| true' \
+      --preview-window "$(_fzf_preview_window_option)" \
+    | sed -e "s/\x1b\[[^m]*m//g" \
+    | awk '{print $1}'
+}
 
 function repo(){
   local dir
-  dir=$(ghq list -p | fzf --reverse --prompt "> " --preview "ls -alh --color=always '{}'" --preview-window 'down:50%' )
+  dir=$(ghq list -p | fzf --reverse --prompt "> " --preview "ls -alh --color=always '{}'" --preview-window "$(_fzf_preview_window_option)" )
   if [ -n "$dir" ]; then
     cd $dir
   fi
