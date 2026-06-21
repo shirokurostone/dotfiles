@@ -204,6 +204,10 @@ if [ $commands[kubectl] ]; then
   source <(kubectl completion zsh)
 fi
 
+# https://docs.astral.sh/uv/reference/environment/#uv_exclude_newer
+export UV_EXCLUDE_NEWER="14 days"
+
+
 ########################################
 # 関数
 source  "$(dirname $(readlink ~/.zshrc))/snippet.sh"
